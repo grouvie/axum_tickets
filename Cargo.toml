@@ -12,7 +12,7 @@ serde_with = "3.3.0"
 # Axum
 axum = { version= "0.6.20", features = ["macros"] }
 tower-http = { version = "0.4.4", features = ["fs"] }
-tower-cookies = { version = "0.9.0", features = ["axum-core", "private", "signed"] }
+tower-cookies = { version = "0.9.0", features = ["axum-core", "private"] }
 # Others
 chrono = "0.4.24"
 lazy-regex = "3.0.2"
