@@ -47,8 +47,8 @@ pub(crate) async fn mw_ctx_resolver<B>(
 
     // Compute Result<Ctx>.
     let result_ctx = match auth_token.ok_or(Error::AuthFailNoAuthTokenCookie).and_then(parse_token) {
-        Ok((user_id, timestamp_string)) => {
-            match timestamp_is_valid(&timestamp_string) {
+        Ok((user_id, exp)) => {
+            match timestamp_is_valid(&exp) {
                 Ok(()) => {
                     let timestamp = Utc::now().timestamp();
                     let token = format!("user-{}.{}", user_id, timestamp);
@@ -124,9 +124,9 @@ pub(crate) fn remove_private_cookie(cookies: Cookies) -> Result<()> {
     Ok(())
 }
 
-fn timestamp_is_valid(timestamp_string: &str) -> Result<()> {
+fn timestamp_is_valid(exp: &str) -> Result<()> {
     // Parse the timestamp string as an integer
-    let timestamp = match timestamp_string.parse::<i64>() {
+    let timestamp = match exp.parse::<i64>() {
         Ok(timestamp) => timestamp,
         Err(_) => {
             return Err(Error::AuthFailInvalidTimestamp);
