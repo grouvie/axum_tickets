@@ -48,15 +48,12 @@ pub(crate) async fn mw_ctx_resolver<B>(
     // Compute Result<Ctx>.
     let result_ctx = match auth_token.ok_or(Error::AuthFailNoAuthTokenCookie).and_then(parse_token) {
         Ok((user_id, exp)) => {
-            match timestamp_is_valid(&exp) {
-                Ok(()) => {
-                    let timestamp = Utc::now().timestamp();
-                    let token = format!("user-{}.{}", user_id, timestamp);
-                    set_private_cookie(cookies.clone(), token)?;
-                    Ok(Ctx::new(user_id))
-                }
-                Err(err) => Err(err),
-            }
+            timestamp_is_valid(&exp).and_then(|_| {
+                let timestamp = Utc::now().timestamp();
+                let token = format!("user-{}.{}", user_id, timestamp);
+                set_private_cookie(cookies.clone(), token)?;
+                Ok(Ctx::new(user_id))
+            })
         }
         Err(e) => Err(e),
     };
